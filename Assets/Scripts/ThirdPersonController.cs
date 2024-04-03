@@ -17,11 +17,18 @@ public class ThirdPersonController : MonoBehaviour
     float currentVelocity;
     public float smoothTime = 0.1f;
 
+    //Variables for Jump method
+    Rigidbody rb;
+    public float jumpVelocity = 10.0f;
+
     // Start is called before the first frame update
     void Start()
     {
         //Getting reference to animator component on our gameobject
         anim = GetComponent<Animator>();
+
+        //Get reference to rigid body component of herc
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -75,5 +82,16 @@ public class ThirdPersonController : MonoBehaviour
         // Set speed to animator
         anim.SetFloat("speed", speed);
 
+        //Call jump method if user presses jump
+        if(Input.GetButtonDown("Jump")){
+            anim.SetTrigger("jump");
+        }
+
+    }
+    public void Jump(){
+        anim.applyRootMotion = false;
+        Vector3 vel = new Vector3(rb.velocity.x, jumpVelocity, rb.velocity.z);
+        rb.velocity = vel;
+        
     }
 }
