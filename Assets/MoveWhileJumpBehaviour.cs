@@ -2,23 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class jumpAtMid : StateMachineBehaviour
+public class MoveWhileJumpBehaviour : StateMachineBehaviour
 {
     ThirdPersonController thirdPerson;
+    Rigidbody rb;
+    public float forceMultiplier = 10;
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-    //    
-    animator.applyRootMotion = false;
-    thirdPerson = animator.GetComponent<ThirdPersonController>();
-    thirdPerson.Jump();
+      thirdPerson = animator.GetComponent<ThirdPersonController>();
+      rb = animator.GetComponent<Rigidbody>();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
-    //override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
-    //{
-    //    
-    //}
+    override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+      if(rb.velocity.z < thirdPerson.maxSpeed){
+        rb.AddForce(thirdPerson.input * forceMultiplier);
+      }
+    }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     //override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
