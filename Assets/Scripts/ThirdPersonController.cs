@@ -4,22 +4,31 @@ using UnityEngine;
 
 public class ThirdPersonController : MonoBehaviour
 {
+    //Basic component references
     Animator anim;
+    Rigidbody rb;
+
+    //Character movement 
     public float acceleration = 10;
-    public float deceleration = 10;
+    public float deceleration = 4;
     public float maxSpeed = 10;
-    float speed = 0;
+    //[HideInInspector]
+    public float speed = 0;
+    public float jumpVelocity = 10f;
 
+    //Camera movement
     public Transform cam;
-
-
-    //SmoothDampAngle parameters 
     float currentVelocity;
     public float smoothTime = 0.1f;
 
-    //Variables for Jump method
-    Rigidbody rb;
-    public float jumpVelocity = 10.0f;
+    //Ground check 
+    bool isGrounded ;
+    public LayerMask GroundLayer;
+    float feetSphereRadius = 0.1f;
+
+    [HideInInspector]
+    public Vector3 input;
+
 
     // Start is called before the first frame update
     void Start()
@@ -35,7 +44,7 @@ public class ThirdPersonController : MonoBehaviour
     void Update()
     {
         //Get user's input that will determine Herc's forward direction
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"),0,Input.GetAxisRaw("Vertical"));
+        input = new Vector3(Input.GetAxisRaw("Horizontal"),0,Input.GetAxisRaw("Vertical"));
 
         //Get the magnitude of user's input which will be continous for joystick
         float inputMagnitude = input.magnitude;
@@ -82,16 +91,31 @@ public class ThirdPersonController : MonoBehaviour
         // Set speed to animator
         anim.SetFloat("speed", speed);
 
+        //Communicate the isGrounded bool to animator
+        anim.SetBool("isGrounded", isGrounded);
+
         //Call jump method if user presses jump
-        if(Input.GetButtonDown("Jump")){
+        if(Input.GetButtonDown("Jump") && isGrounded == true){
             anim.SetTrigger("jump");
         }
 
+    }
+    private void FixedUpdate(){
+        CheckGrounded();
     }
     public void Jump(){
         anim.applyRootMotion = false;
         Vector3 vel = new Vector3(rb.velocity.x, jumpVelocity, rb.velocity.z);
         rb.velocity = vel;
         
+    }
+
+    void CheckGrounded(){
+        if(Physics.CheckSphere(transform.position, feetSphereRadius, GroundLayer )){
+            isGrounded = true;
+        }
+        else{
+            isGrounded = false;
+        }
     }
 }
